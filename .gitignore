@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Firebase secrets
+serviceAccountKey.json
+recycai-backend/serviceAccountKey.json
+
+# Environment files
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
