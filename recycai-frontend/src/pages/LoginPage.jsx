@@ -4,6 +4,7 @@ import { Leaf, Truck, User, ArrowRight } from 'lucide-react';
 const LoginPage = ({ onNavigate, onLogin }) => {
   const [role, setRole] = useState('society');
   const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState(''); // Added password field
   const [name, setName] = useState(''); // Added to mock session name
 
   const handleSubmit = (e) => {
@@ -68,7 +69,7 @@ const LoginPage = ({ onNavigate, onLogin }) => {
                   <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Your Name (Optional)</label>
                   <input
                     type="text"
-                    className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all font-medium"
+                    className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all font-medium text-gray-900"
                     placeholder="Enter display name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -82,10 +83,22 @@ const LoginPage = ({ onNavigate, onLogin }) => {
               <input
                 type="text"
                 required
-                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all font-mono text-center font-bold"
+                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all font-mono text-center font-bold text-gray-900"
                 placeholder={role === 'society' ? "XXXXXXXXXXXX" : "COLLECTOR-XX"}
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Password</label>
+              <input
+                type="password"
+                required
+                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all font-medium text-gray-900"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>

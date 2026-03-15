@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Package, CheckCircle2, RefreshCw, Scale, Award, Radio } from 'lucide-react';
+import { RefreshCw, Radio, CheckCircle2, Package, TrendingUp } from 'lucide-react';
+import StatCard from '../components/StatCard';
+import PickupCard from '../components/PickupCard';
 
-const POLL_INTERVAL = 10000; // Refresh every 10 seconds
+const POLL_INTERVAL = 10000;
 
 const KabadiwalaDashboard = () => {
-  const [pickups, setPickups] = useState([]);
+  const [allPickups, setAllPickups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedPickup, setSelectedPickup] = useState(null);
-  const [weight, setWeight] = useState('');
-  const [confirming, setConfirming] = useState(false);
+  
+  // State for the currently accepted pickup weight input
+  const [acceptedPickupId, setAcceptedPickupId] = useState(null);
+  const [weightInput, setWeightInput] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [lastRefresh, setLastRefresh] = useState(null);
 
@@ -18,162 +22,159 @@ const KabadiwalaDashboard = () => {
     if (!silent) setLoading(true);
     try {
       const response = await axios.get('http://localhost:5000/pickups');
-      setPickups(response.data.filter(p => p.status === 'requested'));
+      setAllPickups(response.data);
       setLastRefresh(new Date());
       setError('');
     } catch (err) {
       setError('Failed to load pickup requests.');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 
-  // Initial fetch + auto-polling every 10 seconds
   useEffect(() => {
     fetchPickups();
     const interval = setInterval(() => fetchPickups(true), POLL_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchPickups]);
 
-  const handleConfirm = async (e) => {
-    e.preventDefault();
-    if (!weight || parseFloat(weight) <= 0) return;
+  const handleAccept = (id) => {
+    setAcceptedPickupId(id);
+    setWeightInput('');
+    // Ideally we'd hit an API to update status to "accepted", 
+    // but revealing the input UI is sufficient for the MVP flow.
+  };
+
+  const handleConfirm = async (id) => {
+    if (!weightInput || parseFloat(weightInput) <= 0) return;
     
-    setConfirming(true);
+    setIsUpdating(true);
     try {
       const resp = await axios.post('http://localhost:5000/pickup/confirm', {
-        pickupId: selectedPickup.id,
-        weight: parseFloat(weight)
+        pickupId: id,
+        weight: parseFloat(weightInput)
       });
       setSuccessMsg(`Pickup completed! Generated ${resp.data.creditsGenerated} credits.`);
-      setSelectedPickup(null);
-      setWeight('');
+      setAcceptedPickupId(null);
+      setWeightInput('');
       fetchPickups();
+      
+      setTimeout(() => setSuccessMsg(''), 5000); // clear msg after 5s
     } catch (err) {
       setError('Failed to confirm pickup.');
     } finally {
-      setConfirming(false);
+      setIsUpdating(false);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto py-10 px-4">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className="text-3xl font-black text-gray-800">Collector Dashboard</h1>
-          <p className="text-gray-500">Manage and fulfill recycling requests</p>
-        </div>
-        <button 
-          onClick={() => fetchPickups(false)}
-          className="p-3 bg-white border border-green-100 rounded-xl hover:bg-green-50 transition-colors shadow-sm"
-        >
-          <RefreshCw className={`w-5 h-5 text-green-600 ${loading ? 'animate-spin' : ''}`} />
-        </button>
-      </div>
+  const pendingPickups = allPickups.filter(p => p.status === 'requested' || p.status === 'pending');
+  const completedPickups = allPickups.filter(p => p.status === 'completed');
+  const totalWaste = completedPickups.reduce((sum, p) => sum + (p.weight || 0), 0);
 
-      {/* Live sync status bar */}
-      <div className="flex items-center justify-between mb-8 bg-white border border-green-100 rounded-xl px-4 py-3 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <Radio className="w-4 h-4 text-green-500 animate-pulse" />
-          <span className="text-xs font-bold text-green-600 uppercase tracking-widest">Live Sync</span>
-          <span className="text-xs text-gray-400 font-medium">
-            {lastRefresh ? `Updated ${lastRefresh.toLocaleTimeString()}` : 'Connecting...'}
-          </span>
+  // Normalizing pickups for PickupCard
+  const displayPickups = allPickups.map(p => ({
+     ...p,
+     status: acceptedPickupId === (p.id || p._id) ? 'accepted' : p.status === 'requested' ? 'pending' : p.status
+  }));
+
+  // Sort: Accepted first, then pending, then completed
+  displayPickups.sort((a, b) => {
+     if (a.status === 'accepted') return -1;
+     if (b.status === 'accepted') return 1;
+     if (a.status === 'pending' && b.status !== 'pending') return -1;
+     if (b.status === 'pending' && a.status !== 'pending') return 1;
+     return new Date(b.createdAt?._seconds ? b.createdAt._seconds * 1000 : b.date) - new Date(a.createdAt?._seconds ? a.createdAt._seconds * 1000 : a.date);
+  });
+
+  return (
+    <div className="max-w-6xl mx-auto py-10 px-4">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-black text-gray-800">Collector Panel</h1>
+          <p className="text-gray-500 font-medium">Manage municipal recycling requests</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="bg-yellow-100 text-yellow-700 text-xs font-black px-3 py-1 rounded-full">
-            {pickups.length} pending
-          </span>
+        <div className="flex items-center space-x-4">
+           {lastRefresh && (
+             <div className="hidden sm:flex items-center space-x-2 text-gray-500 bg-white px-3 py-1.5 rounded-full border border-gray-200">
+               <Radio className="w-4 h-4 text-green-500 animate-pulse" />
+               <span className="text-xs font-bold uppercase tracking-widest">Live Sync</span>
+             </div>
+           )}
+           <button 
+             onClick={() => fetchPickups(false)}
+             className="p-3 bg-white border border-green-200 rounded-xl hover:bg-green-50 transition-colors shadow-sm text-green-700"
+             title="Refresh"
+           >
+             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+           </button>
         </div>
       </div>
 
       {successMsg && (
-        <div className="bg-emerald-600 text-white p-6 rounded-2xl mb-8 flex items-center space-x-4 animate-bounce">
-          <Award className="w-10 h-10" />
-          <p className="text-lg font-bold">{successMsg}</p>
-          <button onClick={() => setSuccessMsg('')} className="ml-auto font-bold opacity-60">Dismiss</button>
+        <div className="bg-emerald-100 text-emerald-800 border border-emerald-200 p-4 rounded-xl mb-8 flex items-center justify-between shadow-sm">
+          <div className="flex items-center space-x-3">
+             <CheckCircle2 className="w-6 h-6" />
+             <p className="font-bold">{successMsg}</p>
+          </div>
+          <button onClick={() => setSuccessMsg('')} className="font-bold text-emerald-600 hover:text-emerald-800 text-sm">Dismiss</button>
         </div>
       )}
 
-      {selectedPickup ? (
-        <div className="bg-white p-8 rounded-3xl border-2 border-green-600 shadow-2xl relative overflow-hidden">
-           <div className="absolute top-0 right-0 p-4">
-              <button onClick={() => setSelectedPickup(null)} className="text-gray-400 hover:text-gray-600 uppercase text-xs font-black">Cancel</button>
-           </div>
-           <div className="flex items-center space-x-4 mb-6">
-              <Scale className="w-8 h-8 text-green-600" />
-              <h2 className="text-2xl font-bold text-gray-800">Complete Pickup</h2>
-           </div>
-           
-           <div className="bg-green-50 p-4 rounded-xl mb-6">
-              <p className="text-sm font-bold text-green-700 uppercase tracking-widest">Waste Type</p>
-              <p className="text-xl font-bold capitalize text-green-900">{selectedPickup.wasteType}</p>
-           </div>
+      {error && (
+         <div className="bg-red-50 text-red-700 p-4 rounded-xl mb-8 border border-red-100 font-bold text-sm">
+            {error}
+         </div>
+      )}
 
-           <form onSubmit={handleConfirm} className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Measure Weight (kg)</label>
-                <input 
-                  type="number" 
-                  step="0.1"
-                  required
-                  autoFocus
-                  className="w-full px-6 py-4 text-3xl font-black bg-gray-50 border-2 border-transparent focus:border-green-600 focus:bg-white rounded-2xl outline-none transition-all"
-                  placeholder="0.0"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                />
-              </div>
-              <button 
-                disabled={confirming}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-2xl shadow-xl shadow-green-200 text-xl flex items-center justify-center space-x-3 transition-all"
-              >
-                <CheckCircle2 className="w-6 h-6" />
-                <span>{confirming ? 'Processing...' : 'Confirm Fulfillment'}</span>
-              </button>
-           </form>
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <StatCard 
+          title="Pending Requests"
+          value={pendingPickups.length}
+          subtitle="Awaiting pickup"
+          icon={<Package className="w-6 h-6" />}
+          highlight={true}
+        />
+        <StatCard 
+          title="Completed Pickups"
+          value={completedPickups.length}
+          subtitle="Lifetime record"
+          icon={<CheckCircle2 className="w-6 h-6" />}
+        />
+        <StatCard 
+          title="Total Waste Collected"
+          value={`${totalWaste} kg`}
+          subtitle="Diverted from landfill"
+          icon={<TrendingUp className="w-6 h-6" />}
+          highlight={true}
+        />
+      </div>
+
+      {/* Requests */}
+      <h2 className="text-xl font-bold text-gray-800 mb-6">Pickup Queue</h2>
+      
+      {displayPickups.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayPickups.map(pickup => (
+            <PickupCard 
+              key={pickup.id || pickup._id}
+              pickup={pickup}
+              userRole="kabadiwala"
+              onAccept={handleAccept}
+              onConfirm={handleConfirm}
+              weightInput={acceptedPickupId === (pickup.id || pickup._id) ? weightInput : ''}
+              setWeightInput={setWeightInput}
+              isUpdating={isUpdating}
+            />
+          ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {pickups.map(pickup => (
-            <div key={pickup.id} className="bg-white p-6 rounded-2xl border border-green-100 shadow-sm hover:shadow-md transition-all">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-green-50 rounded-lg">
-                  <Package className="w-6 h-6 text-green-600" />
-                </div>
-                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full uppercase tracking-tighter">Pending Approval</span>
-              </div>
-              
-              <div className="mb-6">
-                <div className="flex items-center space-x-2 text-green-700 mb-1">
-                  <Package className="w-4 h-4" />
-                  <span className="text-xs font-black uppercase tracking-widest">{pickup.wasteType}</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">{pickup.societyName}</h3>
-                <p className="text-gray-500 text-sm flex items-center mt-1">
-                   <span className="opacity-60 italic mr-1">at</span> {pickup.location}
-                </p>
-                <p className="text-gray-400 text-[10px] mt-4 uppercase font-bold tracking-tighter">
-                   Requested on {new Date(pickup.createdAt?._seconds * 1000).toLocaleDateString()}
-                </p>
-              </div>
-
-              <button 
-                onClick={() => setSelectedPickup(pickup)}
-                className="w-full py-3 bg-gray-900 border border-gray-900 text-white hover:bg-white hover:text-gray-900 text-sm font-bold rounded-xl transition-all"
-              >
-                Fulfill Request
-              </button>
-            </div>
-          ))}
-
-          {pickups.length === 0 && !loading && (
-            <div className="col-span-full py-20 text-center bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-              <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 font-medium">No pending pickup requests at the moment.</p>
-            </div>
-          )}
-        </div>
+        !loading && (
+          <div className="py-20 text-center bg-white rounded-3xl border border-dashed border-green-200">
+            <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">No pickup requests found.</p>
+          </div>
+        )
       )}
     </div>
   );

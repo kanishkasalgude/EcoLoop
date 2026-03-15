@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ArrowLeft, Trophy, Medal, Crown } from 'lucide-react';
+import { ArrowLeft, Trophy } from 'lucide-react';
+import LeaderboardTable from '../components/LeaderboardTable';
 
 const Leaderboard = ({ onBack }) => {
   const [data, setData] = useState([]);
@@ -22,75 +23,44 @@ const Leaderboard = ({ onBack }) => {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto py-12 px-4">
+    <div className="max-w-4xl mx-auto py-12 px-4">
       <button 
         onClick={onBack}
-        className="flex items-center text-green-700 hover:text-green-900 mb-8 font-bold"
+        className="flex items-center text-green-700 hover:text-green-900 mb-8 font-bold transition-all group"
       >
-        <ArrowLeft className="w-5 h-5 mr-1" /> Back
+        <ArrowLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" /> Back
       </button>
 
-      <div className="bg-white rounded-[2rem] shadow-2xl shadow-green-100 overflow-hidden border border-green-50">
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-10 text-white relative">
-          <div className="flex items-center space-x-4 relative z-10">
-            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
-                <Trophy className="w-10 h-10" />
+      <div className="bg-white rounded-[2rem] shadow-2xl shadow-green-100 overflow-hidden border border-green-50 mb-8">
+        <div className="bg-gradient-to-r from-green-700 to-emerald-600 p-10 text-white relative overflow-hidden">
+          <div className="flex items-center space-x-6 relative z-10">
+            <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-md shadow-lg border border-white/20">
+                <Trophy className="w-10 h-10 text-yellow-300 fill-current" />
             </div>
             <div>
-                <h1 className="text-3xl font-black mb-1">Hall of Green</h1>
-                <p className="text-green-100 text-sm font-medium">Top performing societies this month</p>
+                <h1 className="text-4xl font-black mb-2 tracking-tight">City Recycling Leaderboard</h1>
+                <p className="text-green-50 text-lg font-medium">Leaderboard ranks societies based on verified recyclable waste collection.</p>
             </div>
           </div>
-          <div className="absolute top-0 right-0 p-8 opacity-20 transform translate-x-10 -translate-y-4">
-             <Trophy className="w-48 h-48" />
+          <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-10 -translate-y-4">
+             <Trophy className="w-64 h-64" />
           </div>
         </div>
 
-        {loading ? (
-          <div className="p-20 text-center text-green-700 font-bold animate-pulse">Gathering statistics...</div>
-        ) : error ? (
-          <div className="p-20 text-center text-red-500 font-bold">{error}</div>
-        ) : (
-          <div className="px-4 pb-4">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="text-green-800 text-xs font-black uppercase tracking-widest border-b border-gray-100">
-                    <th className="px-6 py-8 text-left">Rank</th>
-                    <th className="px-6 py-8 text-left">Society</th>
-                    <th className="px-6 py-8 text-right">Green Credits</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {data.map((society, index) => (
-                    <tr key={index} className={`transition-colors ${index === 0 ? 'bg-emerald-50/50' : 'hover:bg-gray-50/50'}`}>
-                      <td className="px-6 py-6">
-                        <div className="flex items-center font-black text-xl">
-                          {index === 0 ? <Crown className="w-6 h-6 text-yellow-500 mr-2" /> : <span className="w-6 mr-2 text-center text-gray-300">#</span>}
-                          <span className={index < 3 ? 'text-green-900' : 'text-gray-400'}>{index + 1}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 font-bold text-gray-800 text-lg">
-                        {society.name}
-                      </td>
-                      <td className="px-6 py-6 text-right">
-                        <div className="inline-block bg-white border border-green-100 px-4 py-2 rounded-xl shadow-sm">
-                            <span className="text-2xl font-black text-green-600">{society.totalCredits.toLocaleString()}</span>
-                            <span className="text-xs font-black text-green-300 ml-1 uppercase">pts</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {data.length === 0 && (
-                    <tr>
-                      <td colSpan="3" className="px-6 py-20 text-center text-gray-400 italic font-medium">No results recorded yet. Be the first!</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+        <div className="p-8 bg-gray-50 border-t border-green-100 min-h-[400px]">
+          {loading ? (
+            <div className="py-20 text-center flex flex-col items-center justify-center space-y-4">
+              <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+              <p className="text-green-700 font-bold uppercase tracking-widest text-sm">Gathering statistics...</p>
             </div>
-          </div>
-        )}
+          ) : error ? (
+            <div className="py-10 px-6 bg-red-50 border border-red-100 rounded-2xl text-center">
+              <p className="text-red-600 font-bold">{error}</p>
+            </div>
+          ) : (
+            <LeaderboardTable leaderboardData={data} />
+          )}
+        </div>
       </div>
     </div>
   );

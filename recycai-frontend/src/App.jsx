@@ -1,154 +1,255 @@
 import React, { useState, useEffect } from 'react';
+import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import SocietyDashboard from './pages/SocietyDashboard';
 import KabadiwalaDashboard from './pages/KabadiwalaDashboard';
 import RequestPickup from './pages/RequestPickup';
 import Leaderboard from './pages/Leaderboard';
-import { Leaf, LogOut, LayoutDashboard, BarChart3, Menu, X } from 'lucide-react';
+import KnowYourWaste from './pages/KnowYourWaste';
+import { Leaf, LogOut, LayoutDashboard, BarChart3, Menu, X, Home, UserPlus, LogIn, Search } from 'lucide-react';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [currentPage, setCurrentPage] = useState('dashboard');
-  const [authPage, setAuthPage] = useState('login'); // 'login' or 'signup'
+  const [currentPage, setCurrentPage] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('recycai_user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+      setCurrentPage('dashboard');
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('recycai_user');
     setUser(null);
-    setCurrentPage('dashboard');
-    setAuthPage('login');
+    setCurrentPage('home');
     setMenuOpen(false);
   };
 
   const navigate = (page) => {
     setCurrentPage(page);
     setMenuOpen(false);
+    window.scrollTo(0, 0);
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-green-50/50">
-        {authPage === 'login' ? (
-          <LoginPage onNavigate={setAuthPage} onLogin={setUser} />
-        ) : (
-          <SignupPage onNavigate={setAuthPage} onLogin={setUser} />
-        )}
-      </div>
-    );
-  }
+  const handleLogin = (userData) => {
+    setUser(userData);
+    setCurrentPage('dashboard');
+  };
 
   const renderPage = () => {
-    if (user.role === 'society') {
+    if (!user) {
       switch (currentPage) {
-        case 'dashboard': return <SocietyDashboard user={user} onNavigate={navigate} />;
-        case 'request': return <RequestPickup user={user} onBack={() => navigate('dashboard')} />;
-        case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
-        default: return <SocietyDashboard user={user} onNavigate={navigate} />;
+        case 'home': return <HomePage onNavigate={navigate} />;
+        case 'login': return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
+        case 'signup': return <SignupPage onNavigate={navigate} onLogin={handleLogin} />;
+        case 'leaderboard': return <Leaderboard onBack={() => navigate('home')} />;
+        case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('home')} />;
+        default: return <HomePage onNavigate={navigate} />;
       }
     } else {
-      switch (currentPage) {
-        case 'dashboard': return <KabadiwalaDashboard />;
-        case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
-        default: return <KabadiwalaDashboard />;
+      if (user.role === 'society') {
+        switch (currentPage) {
+          case 'dashboard': return <SocietyDashboard user={user} onNavigate={navigate} />;
+          case 'request': return <RequestPickup user={user} onBack={() => navigate('dashboard')} />;
+          case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
+          case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
+          default: return <SocietyDashboard user={user} onNavigate={navigate} />;
+        }
+      } else {
+        switch (currentPage) {
+          case 'dashboard': return <KabadiwalaDashboard />;
+          case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
+          case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
+          default: return <KabadiwalaDashboard />;
+        }
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-green-50/30 flex flex-col">
+    <div className="min-h-screen bg-green-50 flex flex-col font-sans text-gray-700">
       {/* Navbar */}
-      <nav className="bg-white border-b border-green-100 px-6 py-4 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white border-b border-green-200 px-6 py-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <button 
-            onClick={() => navigate('dashboard')}
+            onClick={() => navigate(user ? 'dashboard' : 'home')}
             className="flex items-center space-x-2 text-green-800"
           >
-            <div className="bg-green-600 p-1.5 rounded-lg transition-transform hover:scale-110">
+            <div className="bg-green-700 p-1.5 rounded-lg transition-transform hover:scale-110 shadow-sm">
                 <Leaf className="w-6 h-6 text-white fill-current" />
             </div>
             <span className="text-2xl font-black tracking-tightest">RecycAI</span>
           </button>
           
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-1">
-            <button 
-              onClick={() => navigate('dashboard')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'dashboard' ? 'bg-green-600 text-white shadow-lg shadow-green-100' : 'text-gray-500 hover:bg-green-50 hover:text-green-700'}`}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Dashboard</span>
-            </button>
-            <button 
-              onClick={() => navigate('leaderboard')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'leaderboard' ? 'bg-green-600 text-white shadow-lg shadow-green-100' : 'text-gray-500 hover:bg-green-50 hover:text-green-700'}`}
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span>Leaderboard</span>
-            </button>
-            <div className="w-px h-6 bg-gray-100 mx-2"></div>
-            <button 
-              onClick={handleLogout}
-              className="flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-100"
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </button>
+          <div className="hidden md:flex items-center space-x-2">
+            {!user ? (
+              <>
+                <button 
+                  onClick={() => navigate('home')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'home' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
+                >
+                  <Home className="w-4 h-4" />
+                  <span>Home</span>
+                </button>
+                <button 
+                  onClick={() => navigate('leaderboard')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'leaderboard' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Leaderboard</span>
+                </button>
+                <button 
+                  onClick={() => navigate('know-waste')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'know-waste' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
+                >
+                  <Search className="w-4 h-4" />
+                  <span>Know Your Waste</span>
+                </button>
+                <div className="w-px h-6 bg-gray-200 mx-2"></div>
+                <button 
+                  onClick={() => navigate('login')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'login' ? 'bg-emerald-600 text-white shadow-md' : 'text-emerald-700 hover:bg-emerald-50'}`}
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Login</span>
+                </button>
+                <button 
+                  onClick={() => navigate('signup')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'signup' ? 'bg-green-700 text-white shadow-md' : 'bg-green-100 text-green-800 hover:bg-green-200'}`}
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Register</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={() => navigate('dashboard')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'dashboard' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Dashboard</span>
+                </button>
+                <button 
+                  onClick={() => navigate('leaderboard')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'leaderboard' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Leaderboard</span>
+                </button>
+                <button 
+                  onClick={() => navigate('know-waste')}
+                  className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'know-waste' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
+                >
+                  <Search className="w-4 h-4" />
+                  <span>Know Your Waste</span>
+                </button>
+                <div className="w-px h-6 bg-gray-200 mx-2"></div>
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 text-gray-500">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 text-gray-600 hover:bg-green-50 rounded-lg">
              {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
 
         {/* Mobile Nav */}
         {menuOpen && (
-          <div className="md:hidden mt-4 space-y-2 pb-4 animate-in fade-in slide-in-from-top-4 duration-200">
-            <button 
-              onClick={() => navigate('dashboard')}
-              className="w-full flex items-center space-x-3 p-4 rounded-xl bg-gray-50 font-bold text-gray-700 active:bg-green-600 active:text-white"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              <span>Dashboard</span>
-            </button>
-            <button 
-              onClick={() => navigate('leaderboard')}
-              className="w-full flex items-center space-x-3 p-4 rounded-xl bg-gray-50 font-bold text-gray-700 active:bg-green-600 active:text-white"
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span>Leaderboard</span>
-            </button>
-            <button 
-              onClick={handleLogout}
-              className="w-full flex items-center space-x-3 p-4 rounded-xl bg-red-50 font-bold text-red-600 active:bg-red-600 active:text-white"
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Logout</span>
-            </button>
+          <div className="md:hidden mt-4 space-y-2 pb-4 border-t border-green-100 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
+            {!user ? (
+              <>
+                <button onClick={() => navigate('home')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+                  <Home className="w-5 h-5" /><span>Home</span>
+                </button>
+                <button onClick={() => navigate('leaderboard')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+                  <BarChart3 className="w-5 h-5" /><span>Leaderboard</span>
+                </button>
+                <button onClick={() => navigate('know-waste')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+                  <Search className="w-5 h-5" /><span>Know Your Waste</span>
+                </button>
+                <button onClick={() => navigate('login')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-emerald-50 font-bold text-emerald-800">
+                  <LogIn className="w-5 h-5" /><span>Login</span>
+                </button>
+                <button onClick={() => navigate('signup')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-green-100 font-bold text-green-800">
+                  <UserPlus className="w-5 h-5" /><span>Register</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => navigate('dashboard')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+                  <LayoutDashboard className="w-5 h-5" /><span>Dashboard</span>
+                </button>
+                <button onClick={() => navigate('leaderboard')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+                  <BarChart3 className="w-5 h-5" /><span>Leaderboard</span>
+                </button>
+                <button onClick={() => navigate('know-waste')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+                  <Search className="w-5 h-5" /><span>Know Your Waste</span>
+                </button>
+                <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-red-50 font-bold text-red-600">
+                  <LogOut className="w-5 h-5" /><span>Logout</span>
+                </button>
+              </>
+            )}
           </div>
         )}
       </nav>
 
       {/* Main Content */}
-      <main className="flex-grow">
-        <div className="container mx-auto">
-          {renderPage()}
-        </div>
+      <main className="flex-grow w-full">
+        {renderPage()}
       </main>
 
-      <footer className="bg-white border-t border-green-50 py-10 text-center mt-auto">
-        <div className="flex justify-center mb-4">
-           <Leaf className="w-6 h-6 text-green-200" />
+      {/* Footer */}
+      <footer className="bg-white border-t border-green-200 pt-12 pb-8 mt-auto">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
+            <div>
+              <div className="flex items-center justify-center md:justify-start space-x-2 text-green-800 mb-4">
+                <Leaf className="w-6 h-6 text-green-700 fill-current" />
+                <span className="text-xl font-black tracking-tightest">RecycAI</span>
+              </div>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Promoting responsible recycling and sustainable waste management for a greener tomorrow. Connecting citizens, collectors, and recyclers.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-800 mb-4 uppercase tracking-wider text-sm">Quick Links</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><button onClick={() => navigate('home')} className="hover:text-green-700 transition-colors">Home</button></li>
+                <li><button onClick={() => navigate('leaderboard')} className="hover:text-green-700 transition-colors">Leaderboard</button></li>
+                <li><button onClick={() => navigate('know-waste')} className="hover:text-green-700 transition-colors">Know Your Waste</button></li>
+                <li><button onClick={() => navigate('login')} className="hover:text-green-700 transition-colors">Login to Portal</button></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-800 mb-4 uppercase tracking-wider text-sm">Contact Us</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>Helpdesk: support@recycai.gov</li>
+                <li>Toll-Free: 1800-RECYCLE</li>
+                <li>HQ: Municipal Sustainability Dept.</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-100 pt-8 text-center">
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
+              &copy; {new Date().getFullYear()} RecycAI Platform &bull; Sustainable Future Guaranteed
+            </p>
+          </div>
         </div>
-        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Powered by RecycAI &bull; Sustainable Future Guaranteed</p>
       </footer>
     </div>
   );

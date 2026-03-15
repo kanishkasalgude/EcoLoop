@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Leaf, ArrowLeft, Copy, CheckCircle2 } from 'lucide-react';
 
 const SignupPage = ({ onNavigate, onLogin }) => {
-  const [formData, setFormData] = useState({ name: '', location: '' });
+  const [formData, setFormData] = useState({ name: '', location: '', phone: '', email: '' });
   const [loading, setLoading] = useState(false);
   const [registeredId, setRegisteredId] = useState('');
   const [error, setError] = useState('');
@@ -101,7 +101,7 @@ const SignupPage = ({ onNavigate, onLogin }) => {
               <input
                 type="text"
                 required
-                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all placeholder:text-gray-300 font-medium"
+                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all placeholder:text-gray-300 font-medium text-gray-900"
                 placeholder="e.g. Green Valley Apartments"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -112,10 +112,32 @@ const SignupPage = ({ onNavigate, onLogin }) => {
               <input
                 type="text"
                 required
-                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all placeholder:text-gray-300 font-medium"
+                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all placeholder:text-gray-300 font-medium text-gray-900"
                 placeholder="e.g. Sector 2, New Delhi"
                 value={formData.location}
                 onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
+              <input
+                type="tel"
+                required
+                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all placeholder:text-gray-300 font-medium text-gray-900"
+                placeholder="e.g. 9876543210"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email ID</label>
+              <input
+                type="email"
+                required
+                className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-green-500/10 focus:border-green-600 outline-none transition-all placeholder:text-gray-300 font-medium text-gray-900"
+                placeholder="e.g. contact@society.com"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
           </div>

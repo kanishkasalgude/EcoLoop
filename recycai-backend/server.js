@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
 const { db, admin } = require('./firebase');
 
 const app = express();
@@ -158,6 +159,89 @@ app.get('/leaderboard', async (req, res) => {
     }));
 
     res.status(200).json(leaderboard);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ── Multer config for image uploads (stored in memory) ──
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files are allowed.'));
+  }
+});
+
+// ── Waste classification knowledge base ──
+const WASTE_INFO = {
+  plastic: {
+    wasteType: 'Plastic',
+    decompositionTime: '450 years',
+    recyclingSuggestion: 'Rinse and place in the plastic recycling stream. Avoid mixing with food-contaminated plastics.'
+  },
+  paper: {
+    wasteType: 'Paper / Cardboard',
+    decompositionTime: '2–6 weeks',
+    recyclingSuggestion: 'Keep dry and flatten cardboard boxes. Remove any plastic tape before recycling.'
+  },
+  metal: {
+    wasteType: 'Metal',
+    decompositionTime: '200–500 years',
+    recyclingSuggestion: 'Rinse aluminium cans and tin containers. Crush to save space and place in metal recycling.'
+  },
+  glass: {
+    wasteType: 'Glass',
+    decompositionTime: '1 million+ years',
+    recyclingSuggestion: 'Separate by color if possible. Remove caps and rinse before placing in glass recycling.'
+  },
+  ewaste: {
+    wasteType: 'E-Waste',
+    decompositionTime: 'Does not decompose naturally',
+    recyclingSuggestion: 'Take to an authorized e-waste collection center. Never dispose in regular waste.'
+  },
+  fabric: {
+    wasteType: 'Fabric / Textile',
+    decompositionTime: '20–200 years',
+    recyclingSuggestion: 'Donate usable clothing. Torn fabrics can be recycled into industrial rags or insulation.'
+  },
+  wood: {
+    wasteType: 'Wood',
+    decompositionTime: '10–15 years',
+    recyclingSuggestion: 'Untreated wood can be composted or repurposed. Treated wood should go to specialized facilities.'
+  },
+  food: {
+    wasteType: 'Organic / Food Waste',
+    decompositionTime: '1–6 months',
+    recyclingSuggestion: 'Compost at home or use municipal composting services. Avoid mixing with dry recyclables.'
+  }
+};
+
+const WASTE_KEYS = Object.keys(WASTE_INFO);
+
+/**
+ * 6. POST /detect-waste
+ * Accept an image upload and return waste classification.
+ * Currently uses filename-heuristic + random fallback as a stub.
+ * Replace the classification logic with real MINC model inference when ready.
+ */
+app.post('/detect-waste', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided.' });
+    }
+
+    // Stub classification: check filename for known keywords, else pick random
+    const filename = (req.file.originalname || '').toLowerCase();
+    let matched = WASTE_KEYS.find(key => filename.includes(key));
+    if (!matched) {
+      // Pick a weighted-random category for demo purposes
+      matched = WASTE_KEYS[Math.floor(Math.random() * WASTE_KEYS.length)];
+    }
+
+    const info = WASTE_INFO[matched];
+    res.status(200).json(info);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
