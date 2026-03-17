@@ -61,10 +61,10 @@ function App() {
         }
       } else {
         switch (currentPage) {
-          case 'dashboard': return <KabadiwalaDashboard />;
+          case 'dashboard': return <KabadiwalaDashboard user={user} />;
           case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
           case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
-          default: return <KabadiwalaDashboard />;
+          default: return <KabadiwalaDashboard user={user} />;
         }
       }
     }

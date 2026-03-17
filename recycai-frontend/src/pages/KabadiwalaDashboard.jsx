@@ -6,7 +6,7 @@ import PickupCard from '../components/PickupCard';
 
 const POLL_INTERVAL = 10000;
 
-const KabadiwalaDashboard = () => {
+const KabadiwalaDashboard = ({ user }) => {
   const [allPickups, setAllPickups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,7 +22,10 @@ const KabadiwalaDashboard = () => {
   const fetchPickups = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5000/pickups');
+      const url = user?.identifier 
+        ? `http://localhost:5000/pickups?collectorId=${user.identifier}`
+        : 'http://localhost:5000/pickups';
+      const response = await axios.get(url);
       setAllPickups(response.data);
       setLastRefresh(new Date());
       setError('');

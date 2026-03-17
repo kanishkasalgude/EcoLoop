@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+const { spawnSync } = require('child_process');
+const os = require('os');
 const { db, admin } = require('./firebase');
 
 const app = express();
@@ -55,6 +59,18 @@ app.post('/pickup/request', async (req, res) => {
       return res.status(400).json({ error: "societyId and wasteType are required." });
     }
 
+    // Randomly assign to a Kabadiwala to ensure distribution
+    const kabadiwalasSnapshot = await db.collection('kabadiwalas').get();
+    let assignedCollectorId = 'UNASSIGNED';
+    let assignedCollectorName = 'Unassigned Collector';
+
+    if (!kabadiwalasSnapshot.empty) {
+      const kabadiwalas = kabadiwalasSnapshot.docs;
+      const randomDoc = kabadiwalas[Math.floor(Math.random() * kabadiwalas.length)];
+      assignedCollectorId = randomDoc.id;
+      assignedCollectorName = randomDoc.data().name;
+    }
+
     const pickupRef = db.collection('pickups').doc();
     const pickupData = {
       id: pickupRef.id,
@@ -64,6 +80,8 @@ app.post('/pickup/request', async (req, res) => {
       wasteType,
       weight: 0,
       status: "requested",
+      collectorId: assignedCollectorId,
+      collectorName: assignedCollectorName,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     };
 
@@ -125,18 +143,23 @@ app.post('/pickup/confirm', async (req, res) => {
 
 /**
  * 4. GET /pickups
- * Get all pickups (for Kabadiwala dashboard)
+ * Get all pickups (for Kabadiwala dashboard). Can be filtered by collectorId.
  */
 app.get('/pickups', async (req, res) => {
   try {
+    const { collectorId } = req.query;
     const pickupsSnapshot = await db.collection('pickups')
       .orderBy('createdAt', 'desc')
       .get();
 
-    const pickups = pickupsSnapshot.docs.map(doc => ({
+    let pickups = pickupsSnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
     }));
+
+    if (collectorId) {
+      pickups = pickups.filter(p => p.collectorId === collectorId);
+    }
 
     res.status(200).json(pickups);
   } catch (error) {
@@ -244,9 +267,7 @@ const WASTE_KEYS = Object.keys(WASTE_INFO);
 
 /**
  * 6. POST /detect-waste
- * Accept an image upload and return waste classification.
- * Currently uses filename-heuristic + random fallback as a stub.
- * Replace the classification logic with real MINC model inference when ready.
+ * Accept an image upload and return waste classification using Python inference script.
  */
 app.post('/detect-waste', upload.single('image'), (req, res) => {
   try {
@@ -254,17 +275,73 @@ app.post('/detect-waste', upload.single('image'), (req, res) => {
       return res.status(400).json({ error: 'No image file provided.' });
     }
 
-    // Stub classification: check filename for known keywords, else pick random
-    const filename = (req.file.originalname || '').toLowerCase();
-    let matched = WASTE_KEYS.find(key => filename.includes(key));
-    if (!matched) {
-      // Pick a weighted-random category for demo purposes
-      matched = WASTE_KEYS[Math.floor(Math.random() * WASTE_KEYS.length)];
+    // Save uploaded file buffer to a temporary file
+    const tempFilePath = path.join(os.tmpdir(), `upload-${Date.now()}-${Math.round(Math.random() * 1000)}.jpg`);
+    fs.writeFileSync(tempFilePath, req.file.buffer);
+
+    // Call predict.py
+    const scriptPath = path.join(__dirname, 'waste_detector', 'predict.py');
+    const pythonProcess = spawnSync('python', [scriptPath, tempFilePath], { encoding: 'utf-8' });
+
+    // Clean up temporary file
+    if (fs.existsSync(tempFilePath)) {
+      fs.unlinkSync(tempFilePath);
     }
 
-    const info = WASTE_INFO[matched];
+    if (pythonProcess.error) {
+      console.error("Failed to start python process:", pythonProcess.error);
+      return res.status(500).json({ error: 'Failed to run waste detection model.' });
+    }
+
+    // Parse Python stdout
+    let predictionResult;
+    try {
+      // Find JSON block in stdout in case of TF logs
+      const outputLines = pythonProcess.stdout.trim().split('\n');
+      const jsonLine = outputLines[outputLines.length - 1]; // Assume last line is the JSON
+      predictionResult = JSON.parse(jsonLine);
+    } catch (e) {
+      console.error("Failed to parse python output. stdout:", pythonProcess.stdout, "stderr:", pythonProcess.stderr);
+      return res.status(500).json({ error: 'Failed to parse model output.' });
+    }
+
+    if (predictionResult.error) {
+      console.error("Python script error:", predictionResult.error);
+      return res.status(500).json({ error: predictionResult.error });
+    }
+
+    const predictedClass = predictionResult.predicted_class || '';
+
+    // Map Python prediction to WASTE_INFO keys
+    const classMapping = {
+      'plastic': 'plastic',
+      'paper': 'paper',
+      'metal': 'metal',
+      'glass': 'glass',
+      'fabric': 'fabric',
+      'wood': 'wood',
+      'food': 'food',
+      'foliage': 'food'
+    };
+
+    let matchedKey = classMapping[predictedClass.toLowerCase()];
+    
+    // If we couldn't map exactly, try guessing or give a generic response
+    let info;
+    if (matchedKey && WASTE_INFO[matchedKey]) {
+      info = { ...WASTE_INFO[matchedKey], confidence: predictionResult.confidence };
+    } else {
+      info = {
+        wasteType: predictedClass.charAt(0).toUpperCase() + predictedClass.slice(1),
+        decompositionTime: 'Varies',
+        recyclingSuggestion: 'Please check local municipal guidelines for proper disposal.',
+        confidence: predictionResult.confidence
+      };
+    }
+
     res.status(200).json(info);
   } catch (error) {
+    console.error("Express Error:", error);
     res.status(500).json({ error: error.message });
   }
 });

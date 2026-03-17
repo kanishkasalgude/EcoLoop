@@ -32,9 +32,9 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 async function seed() {
   console.log("Starting data generation...");
 
-  // 1. Create 10 Kabadiwala accounts
+  // 1. Create 3 Kabadiwala accounts (reduced from 10)
   const kabadiwalas = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 3; i++) {
     // Offset by 4 to avoid overwriting COLLECTOR-01 to COLLECTOR-04
     const idNum = String(i + 5).padStart(2, '0');
     const kRef = db.collection('kabadiwalas').doc(`COLLECTOR-${idNum}`);
@@ -49,9 +49,9 @@ async function seed() {
     console.log(`Created Kabadiwala: ${kData.name} (${kData.id})`);
   }
 
-  // 2. Create 20 Societes
+  // 2. Create 5 Societes (reduced from 20)
   const societies = [];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 5; i++) {
     const sRef = db.collection('societies').doc(); // Auto ID
     const sData = {
       id: sRef.id,
@@ -69,8 +69,8 @@ async function seed() {
   for (const society of societies) {
     let societyTotalCredits = 0;
     
-    // Create 3 to 6 pickups per society
-    const numPickups = Math.floor(Math.random() * 4) + 3; 
+    // Create 1 to 3 pickups per society (reduced from 3-6)
+    const numPickups = Math.floor(Math.random() * 3) + 1; 
     
     for (let j = 0; j < numPickups; j++) {
       const pRef = db.collection('pickups').doc();
@@ -105,12 +105,10 @@ async function seed() {
         createdAt: admin.firestore.Timestamp.fromDate(pastDate)
       };
       
-      // Add collector info if completed
-      if (isCompleted) {
-        const randomCollector = kabadiwalas[Math.floor(Math.random() * kabadiwalas.length)];
-        pData.collectorId = randomCollector.id;
-        pData.collectorName = randomCollector.name;
-      }
+      // Always assign a collector to ensure fair distribution across Kabadiwalas
+      const randomCollector = kabadiwalas[Math.floor(Math.random() * kabadiwalas.length)];
+      pData.collectorId = randomCollector.id;
+      pData.collectorName = randomCollector.name;
       
       await pRef.set(pData);
     }
