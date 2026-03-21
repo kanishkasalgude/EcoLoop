@@ -6,8 +6,9 @@ import SocietyDashboard from './pages/SocietyDashboard';
 import KabadiwalaDashboard from './pages/KabadiwalaDashboard';
 import RequestPickup from './pages/RequestPickup';
 import Leaderboard from './pages/Leaderboard';
-import KnowYourWaste from './pages/KnowYourWaste';
+// import KnowYourWaste from './pages/KnowYourWaste';
 import { Leaf, LogOut, LayoutDashboard, BarChart3, Menu, X, Home, UserPlus, LogIn, Search } from 'lucide-react';
+import logo from './assets/logo.png';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,7 +48,7 @@ function App() {
         case 'login': return <LoginPage onNavigate={navigate} onLogin={handleLogin} />;
         case 'signup': return <SignupPage onNavigate={navigate} onLogin={handleLogin} />;
         case 'leaderboard': return <Leaderboard onBack={() => navigate('home')} />;
-        case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('home')} />;
+// case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('home')} />;
         default: return <HomePage onNavigate={navigate} />;
       }
     } else {
@@ -56,14 +57,14 @@ function App() {
           case 'dashboard': return <SocietyDashboard user={user} onNavigate={navigate} />;
           case 'request': return <RequestPickup user={user} onBack={() => navigate('dashboard')} />;
           case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
-          case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
+// case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
           default: return <SocietyDashboard user={user} onNavigate={navigate} />;
         }
       } else {
         switch (currentPage) {
           case 'dashboard': return <KabadiwalaDashboard user={user} />;
           case 'leaderboard': return <Leaderboard onBack={() => navigate('dashboard')} />;
-          case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
+// case 'know-waste': return <KnowYourWaste onNavigate={navigate} onBack={() => navigate('dashboard')} />;
           default: return <KabadiwalaDashboard user={user} />;
         }
       }
@@ -73,16 +74,17 @@ function App() {
   return (
     <div className="min-h-screen bg-green-50 flex flex-col font-sans text-gray-700">
       {/* Navbar */}
-      <nav className="bg-white border-b border-green-200 px-6 py-4 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white border-b border-green-200 px-6 py-3 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <button 
             onClick={() => navigate(user ? 'dashboard' : 'home')}
-            className="flex items-center space-x-2 text-green-800"
+            className="flex items-center space-x-1 text-green-800"
           >
-            <div className="bg-green-700 p-1.5 rounded-lg transition-transform hover:scale-110 shadow-sm">
-                <Leaf className="w-6 h-6 text-white fill-current" />
+            <img src={logo} alt="EcoLoop Logo" className="h-14 md:h-16 w-auto" />
+            <div className="flex flex-col">
+              <span className="text-2xl font-black tracking-tightest leading-none">EcoLoop</span>
+              <span className="text-xs font-bold text-gray-400">Recycle. Earn. Lead.</span>
             </div>
-            <span className="text-2xl font-black tracking-tightest">RecycAI</span>
           </button>
           
           {/* Desktop Nav */}
@@ -103,6 +105,7 @@ function App() {
                   <BarChart3 className="w-4 h-4" />
                   <span>Leaderboard</span>
                 </button>
+                {/* 
                 <button 
                   onClick={() => navigate('know-waste')}
                   className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'know-waste' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
@@ -110,6 +113,7 @@ function App() {
                   <Search className="w-4 h-4" />
                   <span>Know Your Waste</span>
                 </button>
+                */}
                 <div className="w-px h-6 bg-gray-200 mx-2"></div>
                 <button 
                   onClick={() => navigate('login')}
@@ -142,6 +146,7 @@ function App() {
                   <BarChart3 className="w-4 h-4" />
                   <span>Leaderboard</span>
                 </button>
+                {/* 
                 <button 
                   onClick={() => navigate('know-waste')}
                   className={`flex items-center space-x-1 px-4 py-2 rounded-xl text-sm font-bold transition-all ${currentPage === 'know-waste' ? 'bg-green-700 text-white shadow-md' : 'text-gray-600 hover:bg-green-50 hover:text-green-800'}`}
@@ -149,6 +154,7 @@ function App() {
                   <Search className="w-4 h-4" />
                   <span>Know Your Waste</span>
                 </button>
+                */}
                 <div className="w-px h-6 bg-gray-200 mx-2"></div>
                 <button 
                   onClick={handleLogout}
@@ -178,9 +184,11 @@ function App() {
                 <button onClick={() => navigate('leaderboard')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
                   <BarChart3 className="w-5 h-5" /><span>Leaderboard</span>
                 </button>
-                <button onClick={() => navigate('know-waste')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
-                  <Search className="w-5 h-5" /><span>Know Your Waste</span>
-                </button>
+                {/* 
+222:                 <button onClick={() => navigate('know-waste')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+223:                   <Search className="w-5 h-5" /><span>Know Your Waste</span>
+224:                 </button>
+225:                 */}
                 <button onClick={() => navigate('login')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-emerald-50 font-bold text-emerald-800">
                   <LogIn className="w-5 h-5" /><span>Login</span>
                 </button>
@@ -196,9 +204,11 @@ function App() {
                 <button onClick={() => navigate('leaderboard')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
                   <BarChart3 className="w-5 h-5" /><span>Leaderboard</span>
                 </button>
-                <button onClick={() => navigate('know-waste')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
-                  <Search className="w-5 h-5" /><span>Know Your Waste</span>
-                </button>
+                {/* 
+240:                 <button onClick={() => navigate('know-waste')} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-gray-50 font-bold text-gray-700">
+241:                   <Search className="w-5 h-5" /><span>Know Your Waste</span>
+242:                 </button>
+243:                 */}
                 <button onClick={handleLogout} className="w-full flex items-center space-x-3 p-3 rounded-xl bg-red-50 font-bold text-red-600">
                   <LogOut className="w-5 h-5" /><span>Logout</span>
                 </button>
@@ -218,12 +228,15 @@ function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
             <div>
-              <div className="flex items-center justify-center md:justify-start space-x-2 text-green-800 mb-4">
-                <Leaf className="w-6 h-6 text-green-700 fill-current" />
-                <span className="text-xl font-black tracking-tightest">RecycAI</span>
+              <div className="flex flex-col items-center justify-center md:items-start space-y-1 mb-4">
+                <div className="flex items-center space-x-2 text-green-800">
+                  <img src={logo} alt="EcoLoop Logo" className="h-8 w-auto" />
+                  <span className="text-xl font-black tracking-tightest">EcoLoop</span>
+                </div>
+                <span className="text-sm font-bold text-gray-500">Recycle. Earn. Lead.</span>
               </div>
               <p className="text-gray-600 text-sm leading-relaxed">
-                Promoting responsible recycling and sustainable waste management for a greener tomorrow. Connecting citizens, collectors, and recyclers.
+                Digitally enabling recycling through smart collection and community competition.
               </p>
             </div>
             <div>
@@ -231,14 +244,14 @@ function App() {
               <ul className="space-y-2 text-sm text-gray-600">
                 <li><button onClick={() => navigate('home')} className="hover:text-green-700 transition-colors">Home</button></li>
                 <li><button onClick={() => navigate('leaderboard')} className="hover:text-green-700 transition-colors">Leaderboard</button></li>
-                <li><button onClick={() => navigate('know-waste')} className="hover:text-green-700 transition-colors">Know Your Waste</button></li>
+                {/* <li><button onClick={() => navigate('know-waste')} className="hover:text-green-700 transition-colors">Know Your Waste</button></li> */}
                 <li><button onClick={() => navigate('login')} className="hover:text-green-700 transition-colors">Login to Portal</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold text-gray-800 mb-4 uppercase tracking-wider text-sm">Contact Us</h4>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li>Helpdesk: support@recycai.gov</li>
+                <li>Helpdesk: support@ecoloop.gov</li>
                 <li>Toll-Free: 1800-RECYCLE</li>
                 <li>HQ: Municipal Sustainability Dept.</li>
               </ul>
@@ -246,7 +259,7 @@ function App() {
           </div>
           <div className="border-t border-gray-100 pt-8 text-center">
             <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">
-              &copy; {new Date().getFullYear()} RecycAI Platform &bull; Sustainable Future Guaranteed
+              &copy; {new Date().getFullYear()} EcoLoop Platform &bull; Sustainable Future Guaranteed
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { ArrowLeft, Award, Package } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const KabadiwalaPanel = ({ onBack }) => {
   const [formData, setFormData] = useState({ pickupId: '', weight: '' });
@@ -37,9 +37,9 @@ const KabadiwalaPanel = ({ onBack }) => {
       </button>
 
       <div className="bg-white p-8 rounded-2xl border border-green-100 shadow-xl">
-        <div className="flex items-center space-x-2 mb-6">
-          <Package className="w-6 h-6 text-green-600" />
-          <h1 className="text-2xl font-bold text-green-800">Kabadiwala Panel</h1>
+        <div className="flex items-center space-x-3 mb-6">
+          <img src={logo} alt="EcoLoop Logo" className="h-10 w-auto" />
+          <h1 className="text-2xl font-bold text-green-800">EcoLoop Collector Panel</h1>
         </div>
         
         {error && (

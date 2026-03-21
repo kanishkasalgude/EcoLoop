@@ -3,6 +3,7 @@ import axios from 'axios';
 import { RefreshCw, Radio, CheckCircle2, Package, TrendingUp } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import PickupCard from '../components/PickupCard';
+import logo from '../assets/logo.png';
 
 const POLL_INTERVAL = 10000;
 
@@ -99,9 +100,12 @@ const KabadiwalaDashboard = ({ user }) => {
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
       <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-black text-gray-800">Collector Panel</h1>
-          <p className="text-gray-500 font-medium">Manage municipal recycling requests</p>
+        <div className="flex items-center space-x-4">
+          <img src={logo} alt="EcoLoop Logo" className="h-12 w-auto drop-shadow-sm" />
+          <div>
+            <h1 className="text-3xl font-black text-gray-800">EcoLoop Collector Panel</h1>
+            <p className="text-gray-500 font-medium">Manage EcoLoop recycling requests</p>
+          </div>
         </div>
         <div className="flex items-center space-x-4">
            {lastRefresh && (

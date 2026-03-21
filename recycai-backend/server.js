@@ -209,6 +209,42 @@ app.get('/leaderboard', async (req, res) => {
   }
 });
 
+/**
+ * 5b. GET /stats/citywide
+ * Get aggregated municipal statistics
+ */
+app.get('/stats/citywide', async (req, res) => {
+  try {
+    // 1. Total waste diverted (sum of weight from completed pickups)
+    const pickupsSnapshot = await db.collection('pickups')
+      .where('status', '==', 'completed')
+      .get();
+    
+    let totalWaste = 0;
+    pickupsSnapshot.forEach(doc => {
+      totalWaste += (doc.data().weight || 0);
+    });
+
+    // 2. Active societies (count)
+    const societiesSnapshot = await db.collection('societies').get();
+    const activeSocieties = societiesSnapshot.size;
+
+    // 3. Green credits generated (sum of totalCredits from all societies)
+    let totalCredits = 0;
+    societiesSnapshot.forEach(doc => {
+      totalCredits += (doc.data().totalCredits || 0);
+    });
+
+    res.status(200).json({
+      wasteDiverted: totalWaste,
+      activeSocieties: activeSocieties,
+      greenCredits: totalCredits
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ── Multer config for image uploads (stored in memory) ──
 const upload = multer({
   storage: multer.memoryStorage(),

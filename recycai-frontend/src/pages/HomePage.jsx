@@ -1,37 +1,199 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Leaf, Recycle, RefreshCw, Trash2, Users, Globe, Zap, ArrowDown, CheckCircle2, IndianRupee, Search, ScanLine, Clock, Lightbulb, Trophy, Gift, Medal } from 'lucide-react';
 import InfoCard from '../components/InfoCard';
 import StatCard from '../components/StatCard';
+import logo from '../assets/logo.png';
 
 const HomePage = ({ onNavigate }) => {
+  const [stats, setStats] = useState({
+    wasteDiverted: 12450,
+    activeSocieties: 342,
+    greenCredits: 85200
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/stats/citywide');
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Error fetching citywide stats:", error);
+      }
+    };
+
+    fetchStats();
+    // Refresh stats every 30 seconds for real-time feel
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="w-full">
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        @keyframes floatReverse {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(20px) rotate(-5deg); }
+        }
+        @keyframes pulseSlow {
+          0%, 100% { opacity: 0.15; transform: scale(1); }
+          50% { opacity: 0.25; transform: scale(1.05); }
+        }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeSlideUp2 {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeSlideUp3 {
+          from { opacity: 0; transform: translateY(50px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes countUp {
+          from { opacity: 0; transform: scale(0.8); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .hero-title { animation: fadeSlideUp 0.8s ease-out 0.2s both; }
+        .hero-subtitle { animation: fadeSlideUp2 0.8s ease-out 0.5s both; }
+        .hero-desc { animation: fadeSlideUp2 0.8s ease-out 0.7s both; }
+        .hero-pills { animation: fadeSlideUp3 0.8s ease-out 0.9s both; }
+        .hero-btns { animation: fadeSlideUp3 0.8s ease-out 1.1s both; }
+        .hero-stats { animation: fadeSlideUp3 0.8s ease-out 1.3s both; }
+        .shimmer-text {
+          background: linear-gradient(90deg, #fff 30%, #a7f3d0 50%, #fff 70%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: shimmer 3s linear infinite;
+        }
+        .float-1 { animation: float 6s ease-in-out infinite; }
+        .float-2 { animation: floatReverse 8s ease-in-out infinite; }
+        .float-3 { animation: float 10s ease-in-out 2s infinite; }
+        .blob { animation: pulseSlow 4s ease-in-out infinite; }
+      `}</style>
+
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-800 to-green-600 text-white py-20 px-6 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')]"></div>
-        <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center">
-          <div className="bg-white/20 p-4 rounded-full mb-8 backdrop-blur-sm border border-white/30">
-            <Leaf className="w-16 h-16 text-green-100" />
+      <section className="bg-gradient-to-br from-green-900 via-green-800 to-emerald-700 text-white min-h-screen flex items-center px-6 relative overflow-hidden">
+        
+        {/* Animated background blobs */}
+        <div className="blob absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-400/20 rounded-full blur-3xl"></div>
+        <div className="blob absolute bottom-[-15%] left-[-10%] w-[600px] h-[600px] bg-green-300/15 rounded-full blur-3xl" style={{animationDelay:'1s'}}></div>
+        <div className="blob absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-yellow-400/10 rounded-full blur-2xl" style={{animationDelay:'2s'}}></div>
+
+        {/* Floating decorative icons */}
+        <div className="float-1 absolute top-[15%] left-[8%] text-green-300/40 hidden lg:block">
+          <Recycle className="w-16 h-16" />
+        </div>
+        <div className="float-2 absolute top-[20%] right-[10%] text-emerald-300/30 hidden lg:block">
+          <Leaf className="w-20 h-20" />
+        </div>
+        <div className="float-3 absolute bottom-[20%] left-[12%] text-green-200/30 hidden lg:block">
+          <Globe className="w-12 h-12" />
+        </div>
+        <div className="float-1 absolute bottom-[25%] right-[8%] text-yellow-300/30 hidden lg:block">
+          <Zap className="w-14 h-14" />
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center text-center w-full py-20">
+          
+          {/* Badge */}
+          <div className="hero-pills flex flex-wrap justify-center gap-3 mb-8">
+            <span className="inline-flex items-center space-x-2 bg-white/15 backdrop-blur-md border border-white/20 text-green-100 px-4 py-2 rounded-full text-sm font-bold">
+              <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse inline-block"></span>
+              <span>Live Municipal Network</span>
+            </span>
+            <span className="inline-flex items-center space-x-2 bg-yellow-400/20 border border-yellow-300/30 text-yellow-200 px-4 py-2 rounded-full text-sm font-bold">
+              <Trophy className="w-4 h-4" />
+              <span>Earn Green Credits</span>
+            </span>
+            <span className="inline-flex items-center space-x-2 bg-white/10 border border-white/20 text-green-100 px-4 py-2 rounded-full text-sm font-bold">
+              <Recycle className="w-4 h-4" />
+              <span>AI-Powered Recycling</span>
+            </span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">
-            RecycAI – Smart Recycling for <br className="hidden md:block"/> Sustainable Cities
+
+          {/* Main Heading */}
+          <h1 className="hero-title text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
+            <span className="shimmer-text">EcoLoop</span>{' '}
+            <span className="text-white">– Smart<br />Recycling Network</span>
           </h1>
-          <p className="text-xl md:text-3xl font-medium text-green-50 mb-12 max-w-3xl leading-relaxed">
-            Digitally connecting citizens, collectors, and recyclers. Be part of the municipal green initiative.
+
+          {/* Tagline */}
+          <p className="hero-subtitle text-2xl md:text-3xl font-bold text-green-200 mb-4 tracking-wide">
+            Recycle. Earn. Lead.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4">
-             <button 
-                onClick={() => onNavigate('leaderboard')}
-                className="bg-white text-green-800 hover:bg-green-50 px-10 py-5 rounded-2xl font-black text-xl transition-all shadow-xl hover:shadow-2xl flex items-center justify-center space-x-3 w-full sm:w-auto"
-             >
-                <Trophy className="w-6 h-6 text-yellow-500" />
-                <span>View Leaderboard</span>
-             </button>
+
+          {/* Description */}
+          <p className="hero-desc text-base md:text-lg text-green-100/80 mb-10 max-w-2xl leading-relaxed font-medium">
+            Join your municipal recycling network — schedule pickups, earn Green Credits
+            for every kilogram recycled, and compete with societies across the city on our
+            live leaderboard. Every action you take helps divert waste from landfills.
+          </p>
+
+          {/* Feature pills row */}
+          <div className="hero-pills flex flex-wrap justify-center gap-3 mb-10 text-sm">
+            {[
+              { icon: <Recycle className="w-4 h-4" />, text: 'Schedule Pickups' },
+              { icon: <Zap className="w-4 h-4" />, text: 'Earn Credits Instantly' },
+              { icon: <Trophy className="w-4 h-4" />, text: 'Climb the Leaderboard' },
+              { icon: <Leaf className="w-4 h-4" />, text: 'Track Your Impact' },
+            ].map((f, i) => (
+              <div key={i} className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-xl border border-white/15">
+                <span className="text-green-300">{f.icon}</span>
+                <span className="font-semibold text-white">{f.text}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="hero-btns flex flex-col sm:flex-row gap-4 mb-16 w-full sm:w-auto">
+            <button 
+              onClick={() => onNavigate('leaderboard')}
+              className="bg-white text-green-800 hover:bg-green-50 px-10 py-4 rounded-2xl font-black text-lg transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center space-x-3 w-full sm:w-auto"
+            >
+              <Trophy className="w-5 h-5 text-yellow-500" />
+              <span>View Leaderboard</span>
+            </button>
+            <button 
+              onClick={() => onNavigate('login')}
+              className="bg-transparent border-2 border-white/50 hover:border-white text-white hover:bg-white/10 px-10 py-4 rounded-2xl font-black text-lg transition-all hover:-translate-y-1 flex items-center justify-center space-x-3 w-full sm:w-auto"
+            >
+              <ArrowRight className="w-5 h-5" />
+              <span>Join Your Society</span>
+            </button>
+          </div>
+
+          {/* Mini live stats bar */}
+          <div className="hero-stats grid grid-cols-3 gap-4 md:gap-8 w-full max-w-2xl border-t border-white/20 pt-8">
+            {[
+              { label: 'Waste Diverted', value: `${stats.wasteDiverted.toLocaleString()} kg`, icon: <Globe className="w-5 h-5 text-green-300" /> },
+              { label: 'Active Societies', value: stats.activeSocieties.toLocaleString(), icon: <Users className="w-5 h-5 text-green-300" /> },
+              { label: 'Green Credits', value: stats.greenCredits.toLocaleString(), icon: <Zap className="w-5 h-5 text-yellow-300" /> },
+            ].map((s, i) => (
+              <div key={i} className="text-center">
+                <div className="flex justify-center mb-1">{s.icon}</div>
+                <p className="text-2xl md:text-3xl font-black text-white">{s.value}</p>
+                <p className="text-xs font-bold text-green-200/70 uppercase tracking-widest mt-1">{s.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Estimated Recycling Value Section */}
+
       <section className="py-20 px-6 bg-green-50 border-y border-green-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-4">
@@ -63,11 +225,10 @@ const HomePage = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* Know Your Waste Feature Preview */}
+      {/* 
       <section className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left — Text */}
             <div>
               <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
                 <Search className="w-4 h-4" />
@@ -108,10 +269,8 @@ const HomePage = ({ onNavigate }) => {
               </button>
             </div>
 
-            {/* Right — Visual */}
             <div className="flex justify-center">
               <div className="relative w-full max-w-sm">
-                {/* Main card */}
                 <div className="bg-green-50 border-2 border-dashed border-green-300 rounded-3xl p-10 flex flex-col items-center text-center">
                   <div className="w-24 h-24 bg-green-100 rounded-3xl flex items-center justify-center mb-6">
                     <ScanLine className="w-12 h-12 text-green-600" />
@@ -133,7 +292,6 @@ const HomePage = ({ onNavigate }) => {
                     </div>
                   </div>
                 </div>
-                {/* Decorative dot */}
                 <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-400 rounded-full opacity-50"></div>
                 <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-emerald-400 rounded-full opacity-40"></div>
               </div>
@@ -141,6 +299,7 @@ const HomePage = ({ onNavigate }) => {
           </div>
         </div>
       </section>
+      */}
 
       {/* Rewards & Prizes Section */}
       <section className="py-24 px-6 bg-gradient-to-br from-green-900 to-green-950 text-white relative overflow-hidden">
@@ -265,7 +424,7 @@ const HomePage = ({ onNavigate }) => {
       <section className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black text-gray-800 mb-4">How RecycAI Works</h2>
+            <h2 className="text-3xl md:text-5xl font-black text-gray-800 mb-4">How EcoLoop Works</h2>
             <p className="text-xl text-gray-500 max-w-2xl mx-auto">A seamless digital flow connecting households to authorized kabadiwalas.</p>
           </div>
 

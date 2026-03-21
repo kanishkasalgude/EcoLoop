@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ArrowLeft, Trophy } from 'lucide-react';
 import LeaderboardTable from '../components/LeaderboardTable';
+import logo from '../assets/logo.png';
 
 const Leaderboard = ({ onBack }) => {
   const [data, setData] = useState([]);
@@ -34,12 +35,12 @@ const Leaderboard = ({ onBack }) => {
       <div className="bg-white rounded-[2rem] shadow-2xl shadow-green-100 overflow-hidden border border-green-50 mb-8">
         <div className="bg-gradient-to-r from-green-700 to-emerald-600 p-10 text-white relative overflow-hidden">
           <div className="flex items-center space-x-6 relative z-10">
-            <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-md shadow-lg border border-white/20">
-                <Trophy className="w-10 h-10 text-yellow-300 fill-current" />
+            <div className="p-3 bg-white rounded-2xl shadow-lg border border-white">
+                <img src={logo} alt="EcoLoop Logo" className="h-12 w-auto object-contain" />
             </div>
             <div>
-                <h1 className="text-4xl font-black mb-2 tracking-tight">City Recycling Leaderboard</h1>
-                <p className="text-green-50 text-lg font-medium">Leaderboard ranks societies based on verified recyclable waste collection.</p>
+                <h1 className="text-4xl font-black mb-2 tracking-tight">EcoLoop Recycling Leaderboard</h1>
+                <p className="text-green-50 text-lg font-medium">Compete with other societies and climb the sustainability rankings.</p>
             </div>
           </div>
           <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-10 -translate-y-4">

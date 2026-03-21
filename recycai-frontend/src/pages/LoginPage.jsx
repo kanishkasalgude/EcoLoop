@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Leaf, Truck, User, ArrowRight } from 'lucide-react';
+import { Truck, User, ArrowRight } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const LoginPage = ({ onNavigate, onLogin }) => {
   const [role, setRole] = useState('society');
@@ -25,10 +26,10 @@ const LoginPage = ({ onNavigate, onLogin }) => {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white p-10 rounded-[2.5rem] shadow-2xl border border-green-100">
         <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-green-600 rounded-2xl mb-4 shadow-lg shadow-green-100">
-            <Leaf className="w-8 h-8 text-white fill-current" />
+          <div className="flex justify-center mb-6">
+            <img src={logo} alt="EcoLoop Logo" className="h-24 w-auto drop-shadow-md object-contain" />
           </div>
-          <h1 className="text-3xl font-black text-green-800 tracking-tight">RecycAI Login</h1>
+          <h1 className="text-3xl font-black text-green-800 tracking-tight">EcoLoop Login</h1>
           <p className="text-gray-400 text-sm mt-1 font-medium">Welcome back to the green platform</p>
         </div>
 

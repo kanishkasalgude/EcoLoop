@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Truck, BarChart3, TrendingUp, Info, Package, Calendar, Radio, RefreshCw } from 'lucide-react';
 import StatCard from '../components/StatCard';
+import logo from '../assets/logo.png';
 
 const POLL_INTERVAL = 10000; // 10 seconds
 
@@ -37,9 +38,14 @@ const SocietyDashboard = ({ user, onNavigate }) => {
     <div className="max-w-6xl mx-auto py-10 px-4">
       <div className="bg-gradient-to-br from-green-700 to-emerald-600 p-8 rounded-3xl text-white mb-8 shadow-xl shadow-green-200">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-black mb-1 text-white">Welcome, {user.name}!</h1>
-            <p className="text-green-100 opacity-90 text-lg">Doing great for the environment today.</p>
+          <div className="flex items-center space-x-4">
+            <div className="bg-white p-2 rounded-xl">
+              <img src={logo} alt="EcoLoop Logo" className="h-12 w-auto object-contain" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black mb-1 text-white">EcoLoop Dashboard</h1>
+              <p className="text-green-100 opacity-90 text-lg">Welcome back, {user.name}!</p>
+            </div>
           </div>
           <div className="flex items-center space-x-3">
             {lastRefresh && (

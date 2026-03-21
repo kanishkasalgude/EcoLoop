@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Leaf, ArrowLeft, Copy, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Copy, CheckCircle2 } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const SignupPage = ({ onNavigate, onLogin }) => {
   const [formData, setFormData] = useState({ name: '', location: '', phone: '', email: '' });
@@ -81,8 +82,8 @@ const SignupPage = ({ onNavigate, onLogin }) => {
         </button>
 
         <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-green-600 rounded-2xl mb-4 shadow-lg shadow-green-100">
-            <Leaf className="w-8 h-8 text-white fill-current" />
+          <div className="flex justify-center mb-6">
+            <img src={logo} alt="EcoLoop Logo" className="h-24 w-auto drop-shadow-md object-contain" />
           </div>
           <h1 className="text-3xl font-black text-green-800">Register Society</h1>
           <p className="text-gray-400 text-sm mt-1">Start tracking your impact today</p>
