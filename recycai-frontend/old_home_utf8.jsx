@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { ArrowRight, Leaf, Recycle, RefreshCw, Trash2, Users, Globe, Zap, ArrowDown, CheckCircle2, IndianRupee, Search, ScanLine, Clock, Lightbulb, Trophy, Gift, Medal, Award, BarChart3, CloudLightning } from 'lucide-react';
 import InfoCard from '../components/InfoCard';
 import StatCard from '../components/StatCard';
@@ -85,7 +85,6 @@ const HomePage = ({ onNavigate }) => {
         .blob { animation: pulseSlow 4s ease-in-out infinite; }
       `}</style>
 
-
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-green-900 via-green-800 to-emerald-700 text-white min-h-screen flex items-center px-6 relative overflow-hidden">
         
@@ -129,7 +128,7 @@ const HomePage = ({ onNavigate }) => {
           {/* Main Heading */}
           <h1 className="hero-title text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
             <span className="shimmer-text">EcoLoop</span>{' '}
-            <span className="text-white">— Smart<br />Recycling Network</span>
+            <span className="text-white">ΓÇô Smart<br />Recycling Network</span>
           </h1>
 
           {/* Tagline */}
@@ -139,7 +138,7 @@ const HomePage = ({ onNavigate }) => {
 
           {/* Description */}
           <p className="hero-desc text-base md:text-lg text-green-100/80 mb-10 max-w-2xl leading-relaxed font-medium">
-            Join your municipal recycling network — schedule pickups, earn Green Credits
+            Join your municipal recycling network ΓÇö schedule pickups, earn Green Credits
             for every kilogram recycled, and compete with societies across the city on our
             live leaderboard. Every action you take helps divert waste from landfills.
           </p>
@@ -148,7 +147,7 @@ const HomePage = ({ onNavigate }) => {
           <div className="hero-pills flex flex-wrap justify-center gap-3 mb-10 text-sm">
             {[
               { icon: <Recycle className="w-4 h-4" />, text: 'Schedule Pickups' },
-              { icon: <CloudLightning className="w-4 h-4" />, text: 'Track CO₂ Saved' },
+              { icon: <CloudLightning className="w-4 h-4" />, text: 'Track COΓéé Saved' },
               { icon: <Trophy className="w-4 h-4" />, text: 'Climb the Leaderboard' },
               { icon: <Award className="w-4 h-4" />, text: 'Unlock Badges' },
             ].map((f, i) => (
@@ -194,6 +193,114 @@ const HomePage = ({ onNavigate }) => {
         </div>
       </section>
 
+
+      <section className="py-20 px-6 bg-green-50 border-y border-green-100">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-4">
+            <h2 className="text-3xl md:text-5xl font-black text-green-900 mb-4">Estimated Recycling Value</h2>
+            <p className="text-xl text-green-700 max-w-2xl mx-auto">Approximate value of commonly recyclable materials.</p>
+          </div>
+          <p className="text-center text-sm text-gray-400 mb-12 italic">* Prices are approximate and may vary by region and market conditions.</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { material: 'Plastic Bottles', price: 'Γé╣10 ΓÇô Γé╣25 / kg', desc: 'Common PET plastic bottles used for beverages.', color: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
+              { material: 'Paper / Cardboard', price: 'Γé╣8 ΓÇô Γé╣15 / kg', desc: 'Includes newspapers, cartons, and packaging paper.', color: 'bg-yellow-50', border: 'border-yellow-200', icon: 'text-yellow-600' },
+              { material: 'Aluminium Cans', price: 'Γé╣80 ΓÇô Γé╣120 / kg', desc: 'Highly recyclable metal used in beverage cans.', color: 'bg-gray-50', border: 'border-gray-200', icon: 'text-gray-600' },
+              { material: 'Iron / Scrap Metal', price: 'Γé╣25 ΓÇô Γé╣40 / kg', desc: 'Includes basic metal waste and small appliances.', color: 'bg-orange-50', border: 'border-orange-200', icon: 'text-orange-600' },
+              { material: 'E-Waste (small electronics)', price: 'Varies widely', desc: 'Includes chargers, cables, and small devices.', color: 'bg-red-50', border: 'border-red-200', icon: 'text-red-600' },
+            ].map((item, i) => (
+              <div key={i} className={`${item.color} border ${item.border} rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow`}>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className={`w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm ${item.icon}`}>
+                    <IndianRupee className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-lg font-black text-gray-800">{item.material}</h3>
+                </div>
+                <p className="text-2xl font-black text-green-700 mb-2">{item.price}</p>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
+                <Search className="w-4 h-4" />
+                <span>AI-Powered</span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-gray-800 mb-6">Know Your Waste</h2>
+              <p className="text-lg text-gray-500 mb-8 leading-relaxed">
+                Use AI to identify waste items and learn how to recycle them properly.
+              </p>
+              <p className="text-gray-600 font-medium mb-6">Upload an image of a waste item to detect:</p>
+              <ul className="space-y-4 mb-10">
+                <li className="flex items-center space-x-3">
+                  <div className="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Recycle className="w-5 h-5 text-emerald-600" />
+                  </div>
+                  <span className="font-bold text-gray-700">Waste type classification</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <span className="font-bold text-gray-700">Decomposition time estimate</span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Lightbulb className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <span className="font-bold text-gray-700">Recycling guidance & tips</span>
+                </li>
+              </ul>
+              <button
+                onClick={() => onNavigate('know-waste')}
+                className="bg-green-700 hover:bg-green-800 text-white font-black px-8 py-4 rounded-2xl shadow-xl shadow-green-200/50 flex items-center space-x-2 transition-all"
+              >
+                <ScanLine className="w-5 h-5" />
+                <span>Try Waste Detector</span>
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex justify-center">
+              <div className="relative w-full max-w-sm">
+                <div className="bg-green-50 border-2 border-dashed border-green-300 rounded-3xl p-10 flex flex-col items-center text-center">
+                  <div className="w-24 h-24 bg-green-100 rounded-3xl flex items-center justify-center mb-6">
+                    <ScanLine className="w-12 h-12 text-green-600" />
+                  </div>
+                  <h3 className="text-xl font-black text-green-800 mb-2">AI Waste Scanner</h3>
+                  <p className="text-sm text-gray-500 mb-6">Snap a photo and let AI identify the waste type for you.</p>
+                  <div className="w-full space-y-3">
+                    <div className="bg-white rounded-xl p-3 flex items-center space-x-3 shadow-sm border border-green-100">
+                      <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center"><Recycle className="w-4 h-4 text-emerald-600" /></div>
+                      <div className="text-left"><p className="text-xs text-gray-400 font-bold">TYPE</p><p className="text-sm font-bold text-gray-700">Plastic Bottle</p></div>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 flex items-center space-x-3 shadow-sm border border-green-100">
+                      <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center"><Clock className="w-4 h-4 text-amber-600" /></div>
+                      <div className="text-left"><p className="text-xs text-gray-400 font-bold">DECOMPOSITION</p><p className="text-sm font-bold text-gray-700">~450 years</p></div>
+                    </div>
+                    <div className="bg-white rounded-xl p-3 flex items-center space-x-3 shadow-sm border border-green-100">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center"><Lightbulb className="w-4 h-4 text-blue-600" /></div>
+                      <div className="text-left"><p className="text-xs text-gray-400 font-bold">SUGGESTION</p><p className="text-sm font-bold text-gray-700">Recycle in plastic stream</p></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -top-3 -right-3 w-8 h-8 bg-green-400 rounded-full opacity-50"></div>
+                <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-emerald-400 rounded-full opacity-40"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      */}
+
       {/* Platform Features Highlight */}
       <section className="py-20 px-6 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto">
@@ -210,8 +317,8 @@ const HomePage = ({ onNavigate }) => {
             />
             <InfoCard 
               icon={<CloudLightning className="w-8 h-8 text-emerald-600" />}
-              title="Real CO₂ Tracking"
-              description="Calculate the exact kilograms of CO₂ emissions you've saved using standard EPA offset formulas."
+              title="Real COΓéé Tracking"
+              description="Calculate the exact kilograms of COΓéé emissions you've saved using standard EPA offset formulas."
               colorClass="bg-emerald-50"
             />
             <InfoCard 
@@ -260,9 +367,9 @@ const HomePage = ({ onNavigate }) => {
               <h3 className="text-2xl font-bold mb-3 text-white">Credit Milestones</h3>
               <p className="text-green-200 leading-relaxed font-medium mb-6">Unlock instant rewards when your society reaches universal credit tiers across the year.</p>
               <ul className="text-sm font-medium text-white/80 space-y-3 bg-black/20 p-4 rounded-xl">
-                 <li className="flex justify-between items-center"><span className="text-white">♻️ 5,000 Credits:</span> <span className="text-green-300 font-bold">Reusable Tote Bags</span></li>
-                 <li className="flex justify-between items-center"><span className="text-white">🌱 15,000 Credits:</span> <span className="text-green-300 font-bold">Composter Kits</span></li>
-                 <li className="flex justify-between items-center"><span className="text-white">🌍 50,000 Credits:</span> <span className="text-green-300 font-bold">Property Tax Rebates</span></li>
+                 <li className="flex justify-between items-center"><span className="text-white">ΓÖ╗∩╕Å 5,000 Credits:</span> <span className="text-green-300 font-bold">Reusable Tote Bags</span></li>
+                 <li className="flex justify-between items-center"><span className="text-white">≡ƒî▒ 15,000 Credits:</span> <span className="text-green-300 font-bold">Composter Kits</span></li>
+                 <li className="flex justify-between items-center"><span className="text-white">≡ƒîì 50,000 Credits:</span> <span className="text-green-300 font-bold">Property Tax Rebates</span></li>
               </ul>
             </div>
 
